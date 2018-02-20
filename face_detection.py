@@ -126,3 +126,6 @@ if __name__ == "__main__":
 		print(face_locations)
 		matches = face_recognition.compare_faces(known_face_encodings, face_encodings)
 		print(matches)
+
+		if matches:
+			print("asd")
