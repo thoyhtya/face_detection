@@ -14,16 +14,14 @@ from os.path import isfile, join
 
 
 class Face:
-	encoding = False
-
-class Image:
-	directory = ""
-	name = ""
+	def __init__(self, encoding=False, face_location=()):
+		self.encoding = encoding
+		self.face_location = face_location
+		self.name = ""
 
 
 def getFaces(imagePath):
 	image = face_recognition.load_image_file(imagePath)
-	#can be lists 
 	face_locations = face_recognition.face_locations(image)
 	face_encodings = face_recognition.face_encodings(image)
 	return face_encodings, face_locations
@@ -118,14 +116,36 @@ def imagesFromDirectory(path="."):
 if __name__ == "__main__":
 	known_face_encodings = []
 	imagePath = "images/"
+	peoplePath = "people/"
+
 	images = imagesFromDirectory(imagePath)
 	print(images)
 
 	for image in images:
-		face_encodings, face_locations = getFaces(imagePath+image)
-		print(face_locations)
-		matches = face_recognition.compare_faces(known_face_encodings, face_encodings)
-		print(matches)
+		try:
+			face_encodings, face_locations = getFaces(imagePath+image)
+			face_count = len(face_encodings)
 
-		if matches:
-			print("asd")
+			print()
+			print(image)
+			print("faces found {}".format(face_count))
+
+			for i in range(face_count):
+				matches = []
+				face_encoding = face_encodings[i]
+				face_location = face_locations[i]
+
+				matches = face_recognition.compare_faces(known_face_encodings, face_encoding)
+				print("matches: {}".format(matches))
+
+				if True in matches:
+					j = matches.index(True)
+					print(known_face_encodings[j])
+				else:
+					print(":(")
+					face = Face(face_encoding, face_location)
+					known_face_encodings.append(face.encoding)
+
+		except Exception as e:
+			print(e)
+			raise
