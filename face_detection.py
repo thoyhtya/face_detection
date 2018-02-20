@@ -12,6 +12,7 @@ from os.path import isfile, join
 # 			else
 # 				create new face
 
+
 class Face:
 	encoding = False
 
@@ -20,8 +21,8 @@ class Image:
 	name = ""
 
 
-def getFaces(image_name):
-	image = face_recognition.load_image_file(image_name)
+def getFaces(imagePath):
+	image = face_recognition.load_image_file(imagePath)
 	#can be lists 
 	face_locations = face_recognition.face_locations(image)
 	face_encodings = face_recognition.face_encodings(image)
@@ -106,7 +107,22 @@ def imagesFromDirectory(path="."):
 	files = [f for f in listdir(path) if isfile(join(path, f))]
 	return files
 
+
+# go through images in directory
+# 	detect faces from each image
+# 		compare found faces to known faces
+# 			if matches
+# 				add image to known face's directory
+# 			else
+# 				create new face
 if __name__ == "__main__":
-	images = imagesFromDirectory()
+	known_face_encodings = []
+	imagePath = "images/"
+	images = imagesFromDirectory(imagePath)
 	print(images)
-	# loopImages()
+
+	for image in images:
+		face_encodings, face_locations = getFaces(imagePath+image)
+		print(face_locations)
+		matches = face_recognition.compare_faces(known_face_encodings, face_encodings)
+		print(matches)
