@@ -35,6 +35,7 @@ def getFaces(imagePath):
 
 
 def imagesFromDirectory(path="."):
+	#TODO handle actual images, not all files
 	files = [f for f in listdir(path) if isfile(join(path, f))]
 	return files
 
@@ -51,7 +52,7 @@ def saveImage(src, dst):
 	
 
 def initKnownFaces(path):
-	#TODO init known faces based on people directories if they exist
+	#TODO try to init known faces based on people-directories
 	return FaceCollection( path )
 
 
