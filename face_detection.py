@@ -1,5 +1,4 @@
 import face_recognition
-import cv2
 from os import listdir, makedirs
 from os.path import isfile, join, exists, dirname
 from shutil import copy2
