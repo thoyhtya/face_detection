@@ -97,6 +97,10 @@ def saveImage(src, dst):
 	print("copying image to {}".format(dst))
 	copy2(src, dst)
 
+def initKnownFaces(path):
+	#TODO init known faces based on people directories if they exist
+	return FaceCollection( path )
+
 
 # go through images in directory
 # 	detect faces from each image
@@ -108,7 +112,7 @@ def saveImage(src, dst):
 if __name__ == "__main__":
 	imagePath = "images/"
 	savePath = "people/"
-	known_faces = FaceCollection( path=join(imagePath, savePath) )
+	known_faces = initKnownFaces( path=join(imagePath, savePath) )
 
 	images = imagesFromDirectory(imagePath)
 	print(images)
