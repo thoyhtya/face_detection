@@ -34,6 +34,7 @@ def getFaces(imagePath):
 	return face_encodings, face_locations
 
 
+#TODO remove or refactor
 def showImage(file, face_encodings, face_locations, known_face_encodings, known_face_names):
 	image = face_recognition.load_image_file("keios.jpg", mode='RGB')
 	image2 = face_recognition.load_image_file(file, mode='RGB')
@@ -81,17 +82,6 @@ def showImage(file, face_encodings, face_locations, known_face_encodings, known_
 	cv2.waitKey(5000)
 	cv2.destroyAllWindows()
 
-def loopImages(path="."):
-	known_face_encodings, known_face_names = initKeios()
-
-	onlyfiles = [f for f in listdir(path) if isfile(join(path, f))]
-
-	for file in onlyfiles:
-		if file.endswith(".jpg"):			
-			face_encodings, face_locations = getFaces(file)
-			print(file)
-			print(face_locations)
-			showImage(file, face_encodings, face_locations, known_face_encodings, known_face_names)
 
 def imagesFromDirectory(path="."):
 	files = [f for f in listdir(path) if isfile(join(path, f))]
