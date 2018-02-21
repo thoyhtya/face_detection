@@ -133,6 +133,7 @@ if __name__ == "__main__":
 				src = join(imagePath, image)
 
 				if True in matches:
+					#atm expects that found face matches only to one known face
 					j = matches.index(True)
 					dst = join(known_faces.path, str(known_faces.faces[j].name), image)
 				else:
