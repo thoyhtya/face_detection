@@ -1,23 +1,30 @@
 import face_recognition
 import cv2
-from os import listdir
-from os.path import isfile, join
-
-
-# go through images in directory
-# 	detect faces from each image
-# 		compare found faces to known faces
-# 			if matches
-# 				add image to known face's directory
-# 			else
-# 				create new face
+from os import listdir, makedirs
+from os.path import isfile, join, exists, dirname
+from shutil import copy2
 
 
 class Face:
-	def __init__(self, encoding=False, face_location=()):
+	count = 0
+	def __init__(self, encoding=False):
 		self.encoding = encoding
-		self.face_location = face_location
-		self.name = ""
+		self.name = str(Face.count)
+		Face.count += 1
+
+class FaceCollection:
+	def __init__(self, path="people/"):
+		self.faces = []
+		self.path = path
+
+	def get_encodings(self):
+		encodings = []
+		for face in self.faces:
+			encodings.append(face.encoding)
+		return encodings
+
+	def add(self, face=Face()):
+		self.faces.append(face)
 
 
 def getFaces(imagePath):
@@ -26,21 +33,6 @@ def getFaces(imagePath):
 	face_encodings = face_recognition.face_encodings(image)
 	return face_encodings, face_locations
 
-
-def initKeios():
-	# read original image 
-	image = face_recognition.load_image_file("keios.jpg")
-	# face_locations = face_recognition.face_locations(image)
-	keios_face_encoding = face_recognition.face_encodings(image)[0]
-
-	known_face_encodings = [
-		keios_face_encoding
-	]
-	known_face_names = [
-		"keios"
-	]
-
-	return known_face_encodings, known_face_names
 
 def showImage(file, face_encodings, face_locations, known_face_encodings, known_face_names):
 	image = face_recognition.load_image_file("keios.jpg", mode='RGB')
@@ -105,6 +97,16 @@ def imagesFromDirectory(path="."):
 	files = [f for f in listdir(path) if isfile(join(path, f))]
 	return files
 
+def saveImage(src, dst):
+	dst_dir = dirname(dst)
+
+	if not exists(dst_dir):
+		print("Creating {}".format(dst_dir))
+		makedirs(dst_dir)
+
+	print("copying image to {}".format(dst))
+	copy2(src, dst)
+
 
 # go through images in directory
 # 	detect faces from each image
@@ -114,16 +116,16 @@ def imagesFromDirectory(path="."):
 # 			else
 # 				create new face
 if __name__ == "__main__":
-	known_face_encodings = []
 	imagePath = "images/"
-	peoplePath = "people/"
+	savePath = "people/"
+	known_faces = FaceCollection( path=join(imagePath, savePath) )
 
 	images = imagesFromDirectory(imagePath)
 	print(images)
 
 	for image in images:
 		try:
-			face_encodings, face_locations = getFaces(imagePath+image)
+			face_encodings, face_locations = getFaces( join(imagePath, image))
 			face_count = len(face_encodings)
 
 			print()
@@ -135,16 +137,20 @@ if __name__ == "__main__":
 				face_encoding = face_encodings[i]
 				face_location = face_locations[i]
 
-				matches = face_recognition.compare_faces(known_face_encodings, face_encoding)
-				print("matches: {}".format(matches))
+				# compare_faces returns known_faces length list of True/False values
+				matches = face_recognition.compare_faces(known_faces.get_encodings(), face_encoding)
+
+				src = join(imagePath, image)
 
 				if True in matches:
 					j = matches.index(True)
-					print(known_face_encodings[j])
+					dst = join(known_faces.path, str(known_faces.faces[j].name), image)
 				else:
-					print(":(")
-					face = Face(face_encoding, face_location)
-					known_face_encodings.append(face.encoding)
+					face = Face(face_encoding)
+					known_faces.add(face)
+					dst = join(known_faces.path, face.name, image)
+
+				saveImage(src, dst)
 
 		except Exception as e:
 			print(e)
