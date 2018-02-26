@@ -36,7 +36,13 @@ def getFaces(imagePath):
 def imagesFromDirectory(path="."):
 	#TODO handle actual images, not all files
 	files = [f for f in listdir(path) if isfile(join(path, f))]
-	return files
+	images = []
+	for file in files:
+		if file.endswith(".jpg"):
+			images.append(file)
+		if file.endswith(".png"):
+			images.append(file)
+	return images
 
 
 def saveImage(src, dst):
