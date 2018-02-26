@@ -56,8 +56,12 @@ def saveImage(src, dst):
     
 
 def initKnownFaces(path):
-    #TODO try to init known faces based on people-directories
-    return FaceCollection(path)
+    if exists(path):
+        print("people path exists")
+        #TODO try to init known faces based on people-directories
+        return FaceCollection(path)
+    else:
+        return FaceCollection(path)
 
 
 # go through images in directory
