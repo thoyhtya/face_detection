@@ -1,7 +1,7 @@
-import face_recognition
 from os import listdir, makedirs
 from os.path import isfile, join, exists, dirname
 from shutil import copy2
+import face_recognition
 
 
 class Face:
@@ -22,18 +22,18 @@ class FaceCollection:
             encodings.append(face.encoding)
         return encodings
 
-    def add(self, face=Face()):
-        self.faces.append(face)
+    def add(self, new_face=Face()):
+        self.faces.append(new_face)
 
 
-def getFaces(imagePath):
-    image = face_recognition.load_image_file(imagePath)
-    face_locations = face_recognition.face_locations(image)
-    face_encodings = face_recognition.face_encodings(image)
-    return face_encodings, face_locations
+def get_faces(image_path):
+    img = face_recognition.load_image_file(image_path)
+    found_face_locations = face_recognition.face_locations(img)
+    found_face_encodings = face_recognition.face_encodings(img)
+    return found_face_encodings, found_face_locations
 
 
-def imagesFromDirectory(path="."):
+def images_from_directory(path="."):
     files = [f for f in listdir(path) if isfile(join(path, f))]
     images = []
     for file in files:
@@ -44,18 +44,18 @@ def imagesFromDirectory(path="."):
     return images
 
 
-def saveImage(src, dst):
-    dst_dir = dirname(dst)
+def save_image(source, destination):
+    dst_dir = dirname(destination)
 
     if not exists(dst_dir):
         print("Creating {}".format(dst_dir))
         makedirs(dst_dir)
 
-    print("copying image to {}".format(dst))
-    copy2(src, dst)
-    
+    print("copying image to {}".format(destination))
+    copy2(source, destination)
 
-def initKnownFaces(path):
+
+def init_known_faces(path):
     if exists(path):
         print("people path exists")
         #TODO try to init known faces based on people-directories
@@ -72,16 +72,16 @@ def initKnownFaces(path):
 #           else
 #               create new face
 if __name__ == "__main__":
-    imagePath = "images/"
-    savePath = "people/"
-    known_faces = initKnownFaces( path=join(imagePath, savePath) )
+    IMAGE_PATH = "images/"
+    SAVE_PATH = "people/"
+    KNOWN_FACES = init_known_faces(path=join(IMAGE_PATH, SAVE_PATH))
 
-    images = imagesFromDirectory(imagePath)
-    print(images)
+    IMAGES = images_from_directory(IMAGE_PATH)
+    print(IMAGES)
 
-    for image in images:
+    for image in IMAGES:
         try:
-            face_encodings, face_locations = getFaces( join(imagePath, image))
+            face_encodings, face_locations = get_faces(join(IMAGE_PATH, image))
             face_count = len(face_encodings)
 
             print()
@@ -94,21 +94,21 @@ if __name__ == "__main__":
                 face_location = face_locations[i]
 
                 # compare_faces returns known_faces length list of True/False values
-                matches = face_recognition.compare_faces(known_faces.get_encodings(), face_encoding)
+                matches = face_recognition.compare_faces(KNOWN_FACES.get_encodings(), face_encoding)
 
-                src = join(imagePath, image)
+                src = join(IMAGE_PATH, image)
 
                 if True in matches:
                     #atm expects that found face matches only to one known face
                     j = matches.index(True)
-                    dst = join(known_faces.path, str(known_faces.faces[j].name), image)
+                    dst = join(KNOWN_FACES.path, str(KNOWN_FACES.faces[j].name), image)
                 else:
-                    face = Face(face_encoding)
-                    known_faces.add(face)
-                    dst = join(known_faces.path, face.name, image)
+                    found_face = Face(face_encoding)
+                    KNOWN_FACES.add(found_face)
+                    dst = join(KNOWN_FACES.path, found_face.name, image)
 
-                saveImage(src, dst)
+                save_image(src, dst)
 
-        except Exception as e:
-            print(e)
+        except Exception as exception:
+            print(exception)
             raise
