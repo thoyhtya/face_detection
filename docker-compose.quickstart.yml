@@ -3,4 +3,4 @@ services:
   face_detection:
     image: thoyhtya/face_detection:latest
     volumes:
-     - ./images:/root/face_detection/images
+     - .:/root/face_detection/images
